@@ -9,7 +9,7 @@
 
 
 #include <iostream>
-#include <stdio.h>
+# include <windows.h>
 using namespace std;
 
 struct Haste{
@@ -101,7 +101,7 @@ void resolucaoIA(Haste*, Haste*, Haste*, int);
 string insereQTD(int, string);
 
 int numeroDeDiscos;
-int jogadas = 1;
+int jogadas = 0;
 int tamanho;
 
 
@@ -115,9 +115,10 @@ int main(){
         cout << "---Torre De Hanoi---\n" <<
             "Escolhar uma opção:\n" <<
             "1 - Jogar Torre De Hanoi\n" <<
-            "2 - IA Resolve\n";
+            "2 - IA Resolve\n\n";
 
-    cin >> escolha;
+        cin >> escolha;
+
     }
     if(escolha == 1 ){
         
@@ -147,16 +148,10 @@ int main(){
     else if(escolha == 2){
        
        while(numeroDeDiscos < 3){
-           cout << "Digite o Numero De Discos(Maior ou igual a 3):" << "\n";
+           cout << "\nDigite o Numero De Discos(Maior ou igual a 3):" << "\n\n";
            cin >> numeroDeDiscos;
        }
         inicializarJogo();
-        esquerda.toString();
-        cout << "\n";
-        meio.toString();
-        cout << "\n";
-        direita.toString();
-        cout << "\n";
         resolucaoIA(&esquerda, &meio, &direita, numeroDeDiscos);
     
     }
@@ -175,11 +170,12 @@ void inicializarJogo(){
     direita.novaHaste(tamanho);
 
 	esquerda.preencheHaste(numeroDeDiscos);
+    constroitorre();
 }
 
 void constroitorre(){
     
-    cout << "Jogada: " << jogadas << "\n\n";
+    cout << "\nJogada: " << jogadas << "\n\n";
     jogadas++;
 
     for (int i = (numeroDeDiscos); i >= 0; i--) {
