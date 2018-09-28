@@ -1,42 +1,144 @@
+/* Praticas De Paradgimas De Linguagens De Programação
+            Projeto Torre De Hanoi
+                Grupo 3
+
+        Alex Micaela
+        Bruno Meneses
+        Lílian Honorio Teixeira        
+        Victor Arruda Câmara Virgolino
+*/
+
+#ifdef _WIN32 
+#define CLEAR "cls"
+#else 
+#define CLEAR "CLS"
+#endif
+
+#include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h> // usa a função pow();, para calcular o valor minimo de movimentos para resolver a torre de hanoi;
-#include <locale.h>
+#include <math.h>
+using namespace std;
 
-int nivelDeDificuldade;
-int numeroDeDiscos;
+struct Haste{
+    int *pilha;
+    int topo;
+    int numerodiscos;
+    
+    void novaHaste(int size) {
+        pilha = new int[size+1];//AQUI!!
+        topo = -1;
+        numerodiscos = size;//AQUI!!
+        zerarArray();
 
-int torre1[3]= {1,2,3}, torre2[3]={0,0,0}, torre3[3] ={0,0,0};
-//int torre14[4]= {1,2,3,4}, torre24[3]={0,0,0,0}, torre34[3] ={0,0,0,0};
-//int torre15[5]= {1,2,3,4,5}, torre25[5]={0,0,0,0,0}, torre35[5] ={0,0,0,0,0};// criar um para cada opção
+    }
+    
+    void zerarArray(){
+        for (int i = 0; i < numerodiscos+1; i++) {
+            pilha[i] = 0;
+        }
+     }
+    
+    bool isEmpty() {
+        return topo == -1;
+    }
+    
+    int get(int indice) {
+        return pilha[indice];
+    }
+    
+    int len() {
+        return numerodiscos;//AQUI!!
+    }
+    
+    
+    
+    bool isFull() {
+        return topo == len()-1;
+    }
+    
+    int top() {
+        if (!isEmpty()) {
+            return pilha[topo];
+        }
+        return -1;
+    }
+    
+    void push(int element) {
+        if (!isFull()) {
+                if(isEmpty()){
+                    topo++;
+                    pilha[topo] = element;
+                }
+                else if(top() < element){
+                    cout << "Movimento invalido";//AQUI
+                }
+                else {
+                    topo++;
+                    pilha[topo] = element;
+                }
+                
+        }
+    }
+    
+    void toString() {
+        for (int i = 0; i < len(); i++){
+            cout << pilha[i] << "--";
+        }
+    }
+    
+    int pop() {
+        int element = top();
+        
+        if (element != -1) {
+            pilha[topo] = 0;
+            topo = topo - 1;
+        }
+        return element;
+    }
+    
+    void preencheHaste(int qtdDiscos) {
+        for(int i = qtdDiscos; i >= 1; i--) {
+            push(i);
+        }
+    }
+    
+    void moveDisco(Haste *destino) {
+        destino->push(pop());
 
-int numeroDeJogadas = 0; 
+    }
+    
+} esquerda, meio, direita;
 
-void mostrarTorres(); 
-
-int valorTorre(int torre[3]); 
-
-int destinoTorre(int torre[3]);
-
-void moverDiscos(int orig, int dest); 
-
-void mostrarMenu(); 
-
-int verificarFinal(); 
-
+void inicializarJogo();
+void constroitorre();
+void resolucaoIA(Haste*, Haste*, Haste*, int);
+string insereQTD(int, string);
+void limparTela();
+void pausar();
+void mostrarMenu(Haste*, Haste*, Haste*);
 void regrasDoJogo();
 
-int main(void){
+int numeroDeDiscos;
+int jogadas;
+int tamanho;
+bool iniciado = false;
+int historico;
+int etapa;
+int nivelDeDificuldade;
 
-  setlocale(LC_ALL, "Portuguese");//nao esta habilitando a acentuacao
+
+int main(){
+
+    setlocale(LC_ALL, "Portuguese");//nao esta habilitando a acentuacao
 
   int opcao = 1;
   while(opcao!=0){
-    printf("---Torre De Hanoi---\n Escolhar uma opção:\n 1 - Jogar Torre De Hanoi\n 2 - IA Resolve\n 3 - Regras do jogo\n 4 - Sair\n  - DIGITE: ");
+    printf("---Torre De Hanoi---\n Escolhar uma opcao:\n 1 - Jogar Torre De Hanoi\n 2 - IA Resolve\n 3 - Regras do jogo\n 4 - Sair\n  - DIGITE: ");
     scanf("%d", &opcao);
     switch(opcao){
       case 1:
-          printf("\nEscolha qual será a dificuldade: \n 1 - Fácil(3 discos)\n 2 - Médio(4 discos)\n 3 - Dificil(5 discos)\n");
+          printf("\nEscolha qual sera a dificuldade: \n 1 - Facil(3 discos)\n 2 - Medio(4 discos)\n 3 - Dificil(5 discos)\n");
           scanf("%d", &nivelDeDificuldade);
 
           if(nivelDeDificuldade == 1){
@@ -47,15 +149,48 @@ int main(void){
             numeroDeDiscos = 5;
           }
 
-          mostrarTorres();
-          mostrarMenu();
+         inicializarJogo();
+          mostrarMenu(&esquerda, &meio, &direita);
           break;
+
+      case 2:
+         limparTela();
+       while(numeroDeDiscos < 3){
+           cout << "Digite o numero de discos(Maior ou igual a 3):" << "\n> ";
+           cin >> numeroDeDiscos;
+       }
+                limparTela();
+        cout << "Exibir por etapa? \n" << "1 - Sim  |" <<  " 2 - Nao\n> ";
+        cin >> etapa;
+        limparTela();
+        inicializarJogo();
+
+        resolucaoIA(&esquerda, &meio, &direita, numeroDeDiscos);
+        
+        if (etapa == 1) {
+            limparTela();
+            cout << "\nExibir historico?\n" << "1 - Sim  |" <<  " 2 - Nao\n> ";
+            cin >> historico;
+            if (historico == 1) {
+                limparTela();
+                cout << "\n--Historico de Movimentos---\n\n";
+                inicializarJogo();
+                resolucaoIA(&esquerda, &meio, &direita, numeroDeDiscos);
+            }
+        }
+    
+    
+      break;
       case 3:
           regrasDoJogo();
           break;
+
+      case 4:
+        exit(0);
+
       default:
           if(opcao != 0){
-            printf(" - Opção inválida, por favor informe uma opcao válida.\n - ");
+            printf(" - Opcao invalida, por favor informe uma opcao valida.\n - ");
             system("PAUSE");
             system("CLS");
           }else{
@@ -64,200 +199,100 @@ int main(void){
           }   
           break;
     }
+
   }
-  return 0;
+   
+    return 0;
 }
 
+void inicializarJogo(){
+    iniciado = false;
+    jogadas = 0;
+    tamanho = numeroDeDiscos;
 
-int valorTorre(int torre[]){ 
-  int i, a=0, auxiliar= 2;
+    esquerda.novaHaste(tamanho);
+    meio.novaHaste(tamanho);
+    direita.novaHaste(tamanho);
+    esquerda.preencheHaste(numeroDeDiscos);
+    constroitorre();
+    iniciado = true;
+}
 
-  if(numeroDeDiscos == 4){
-    torre[4];
-    auxiliar = 3;
-  }else if(numeroDeDiscos == 5){
-    torre[5];
-    auxiliar = 4;
-  }
+void limparTela() {
+    system(CLEAR);
+}
 
-  for(i=numeroDeDiscos-1; i>=0; i--){
-    if(torre[i] != 0){
-      a = i;
+void pausar() {
+    cout << "\n\nPressione qualquer tecla para o proximo passo...";
+    fflush(stdin);
+    getchar();
+}
+
+void constroitorre(){ //impressao da torre
+    if (historico == 0 && etapa == 1) {
+        limparTela();
     }
-    if(torre[auxiliar] == 0){
-      a = 0;
+    
+    if (jogadas >= 1) {
+        cout << "Movimento: " << jogadas << "\n\n";
+        jogadas++;
+    } else {
+        cout << "Inicio" << "\n\n";
+        jogadas++;
     }
-  }
-  return(a);
-}
 
+    for (int i = numeroDeDiscos; i >= 0; i--) {
 
-int destinoTorre(int torre[]){ 
-  int i, a=0;
+         string linha = "";
+ 
+        //HASTE ESQUERDA
+ 
+         if (esquerda.get(i) != 0) {
+            int qtdEspacos = (numeroDeDiscos - esquerda.get(i));
+            linha = linha + insereQTD(qtdEspacos, " ") + "(" + insereQTD(esquerda.get(i) * 2, "_") + ")" + insereQTD(qtdEspacos, " ");
+        } else {
+            linha = linha + insereQTD(numeroDeDiscos, " ") + "||" + insereQTD(numeroDeDiscos, " ");
+        }
 
-  if(numeroDeDiscos == 4){
-    torre[4];
-  }else if(numeroDeDiscos == 5){
-    torre[5];
-  }
+        //HASTE CENTRAL
 
-  for(i=0; i<numeroDeDiscos; i++){
-    if(torre[i] == 0){
-      a = i;
+        if (meio.get(i) != 0) {
+            int qtdEspacos = (numeroDeDiscos - meio.get(i));
+            linha = linha + insereQTD(qtdEspacos, " ") + "(" + insereQTD(meio.get(i) * 2, "_") + ")" + insereQTD(qtdEspacos, " ");
+        } else {
+            linha = linha + insereQTD(numeroDeDiscos, " ") + "||" + insereQTD(numeroDeDiscos, " ");
+        }
+
+        //HASTE DIREITA
+
+        if (direita.get(i) != 0) {
+            int qtdEspacos = (numeroDeDiscos - direita.get(i));
+            linha = linha + insereQTD(qtdEspacos, " ") + "(" + insereQTD(direita.get(i) * 2, "_") + ")" + insereQTD(qtdEspacos, " ");
+        } else {
+            linha = linha + insereQTD(numeroDeDiscos, " ") + "||" + insereQTD(numeroDeDiscos, " ");
+        }
+
+        cout << linha << endl;
+        
+    }   
+    if (historico == 0 && etapa == 1) {
+        pausar();
     }
-  }
-  return(a);
+    cout << "\n";
 }
 
-
-void moverDiscos(int origem, int destino){ 
-  int aux1, aux2, aux3;
-  
-  if(numeroDeDiscos == 4){
-    int torre1[4]= {1,2,3,4}, torre2[4]={0,0,0,0}, torre3[4] ={0,0,0,0};
-  }else if(numeroDeDiscos == 5){
-    int torre1[5]= {1,2,3,4,5}, torre2[5]={0,0,0,0,0}, torre3[5] ={0,0,0,0,0};
-  }  
-
-
-  // ORIGEM 1 - TORRE 1
-  if(origem == 1){
-    // DESTINO 2 - TORRE 2  
-    if(destino == 2){
-      aux1 = torre1[valorTorre(torre1)];
-      aux2 = torre2[destinoTorre(torre2)+1] ;
-      aux3 = torre2[valorTorre(torre2)];
-      if(aux3 < aux1 && aux3 != 0){
-        printf("Disco da origem [%d] é maior que o disco de destino [%d]\n", aux1, aux3);
-        system("PAUSE");
-      }else{
-        if(aux1 == 0){
-          printf("Sem discos na torre de origem.\n");
-          system("PAUSE");        
-        }else{
-          torre1[valorTorre(torre1)] = 0;
-          torre2[destinoTorre(torre2)] = aux1;
-          numeroDeJogadas++;
-        }
-      }
-    // DESTINO 3 - TORRE 3
-    }else{
-      aux1 = torre1[valorTorre(torre1)];
-      aux2 = torre3[destinoTorre(torre3)+1] ;
-      aux3 = torre3[valorTorre(torre3)];
-      if(aux3 < aux1 && aux3 != 0){
-        printf("Disco da origem [%d] é maior que o disco de destino [%d]\n", aux1, aux3);
-        system("PAUSE");
-      }else{
-        if(aux1 == 0){
-          printf("Sem discos na torre de origem.\n");
-          system("PAUSE");        
-        }else{
-          torre1[valorTorre(torre1)] = 0;
-          torre3[destinoTorre(torre3)] = aux1;
-          numeroDeJogadas++;
-        }
-      }
-    }     
-  }
-  
-  // ORIGEM 2 - TORRE 2
-  if(origem == 2){
-    // DESTINO 1 - TORRE 1
-    if(destino == 1){
-      aux1 = torre2[valorTorre(torre2)];
-      aux2 = torre1[destinoTorre(torre1)+1] ;
-      aux3 = torre1[valorTorre(torre1)];
-      if(aux3 < aux1 && aux3 != 0){
-        printf("Disco da origem [%d] é maior que o disco de destino [%d]\n", aux1, aux3);
-        system("PAUSE");
-      }else{
-        if(aux1 == 0){
-          printf("Sem discos na torre de origem.\n");
-          system("PAUSE");        
-        }else{
-          torre2[valorTorre(torre2)] = 0;
-          torre1[destinoTorre(torre1)] = aux1;
-          numeroDeJogadas++;
-        }
-      }
-    // DESTINO 3 - TORRE 3
-    }else{
-      aux1 = torre2[valorTorre(torre2)];
-      aux2 = torre3[destinoTorre(torre3)+1] ;
-      aux3 = torre3[valorTorre(torre3)];
-      if(aux3 < aux1 && aux3 != 0){
-        printf("Disco da origem [%d] é maior que o disco de destino [%d]\n", aux1, aux3);
-        system("PAUSE");
-      }else{
-        if(aux1 == 0){
-          printf("Sem discos na torre de origem.\n");
-          system("PAUSE");        
-        }else{
-          torre2[valorTorre(torre2)] = 0;
-          torre3[destinoTorre(torre3)] = aux1;
-          numeroDeJogadas++;         
-        }
-      }
-    } 
-  }
-  
-  // ORIGEM 3 - TORRE 3
-  if(origem == 3){
-    // DESTINO 1 - TORRE 1
-    if(destino == 1){
-      aux1 = torre3[valorTorre(torre3)];
-      aux2 = torre1[destinoTorre(torre1)+1] ;
-      aux3 = torre1[valorTorre(torre1)];
-      if(aux3 < aux1 && aux3 != 0){
-        printf("Disco da origem [%d] é maior que o disco de destino [%d]\n", aux1, aux3);
-        system("PAUSE");
-      }else{
-        if(aux1 == 0){
-          printf("Sem discos na torre de origem.\n");
-          system("PAUSE");        
-        }else{
-          torre3[valorTorre(torre3)] = 0;
-          torre1[destinoTorre(torre1)] = aux1;
-          numeroDeJogadas++;       
-        }   
-      }
-    // DESTINO 2 - TORRE 2
-    }else{
-      aux1 = torre3[valorTorre(torre3)];
-      aux2 = torre2[destinoTorre(torre2)+1] ;
-      aux3 = torre2[valorTorre(torre2)];
-      if(aux3 < aux1 && aux3 != 0){
-        printf("Disco da origem [%d] é maior que o disco de destino [%d]\n", aux1, aux3);
-        system("PAUSE");
-      }else{
-        if(aux1 == 0){
-          printf("Sem discos na torre de origem.\n");
-          system("PAUSE");        
-        }else{
-          torre3[valorTorre(torre3)] = 0;
-          torre2[destinoTorre(torre2)] = aux1;
-          numeroDeJogadas++;
-        }
-      }
-    } 
-  } 
-  mostrarTorres();
-}
-
-
-void mostrarMenu(){
-  int origem, destino, test=0, aux;
+void mostrarMenu(Haste *esquerda, Haste *meio, Haste *direita){
+  int saida, chegada, test=0, aux;
   do{
     // VERIFICA SE GANHOU!
-    if(verificarFinal() == 1){
+    if(direita->isFull()){
       aux = pow(2, numeroDeDiscos)-1;
-      if(numeroDeJogadas == aux){
-        printf("\nParabéns, você ganhou e sua pontuação foi excelente %d de %d.\n", numeroDeJogadas, aux);
-      }else if(numeroDeJogadas > aux && numeroDeJogadas <aux+5){
-        printf("\nParabéns, você ganhou mas sua pontuação foi abaixo da média %d de%d.\n", numeroDeJogadas, aux);
+      if(jogadas == aux){
+        printf("\nParabens, voce ganhou e sua pontuacao foi excelente %d de %d.\n", jogadas, aux);
+      }else if(jogadas > aux && jogadas <aux+5){
+        printf("\nParabens, voce ganhou mas sua pontuacao foi abaixo da media %d de %d.\n", jogadas, aux);
       }else{
-        printf("\nParabéns, você ganhou mas sua pontuação foi ruim: %d de %d.\n", numeroDeJogadas, aux);
+        printf("\nParabens, voce ganhou mas sua pontuacao foi ruim: %d de %d.\n", jogadas, aux);
       }
       system("PAUSE");
       system("CLS");
@@ -265,76 +300,86 @@ void mostrarMenu(){
       exit(0); 
     }
     printf("Informe qual a torre de origem (1 a 3): ");
-    scanf("%d", &origem);
+    scanf("%d", &saida);
     do{
-      if(origem < 1 || origem > 3){
-        printf(" - Torre de origem não corresponde, informe corretamente.\nInforme qual a torre de origem (1 a 3): ");
-        scanf("%d", &origem); 
+      if(saida < 1 || saida > 3){
+        printf(" - Torre de origem nao corresponde, informe corretamente.\nInforme qual a torre de origem (1 a 3): ");
+        scanf("%d", &saida); 
       }
-    }while(origem < 1 || origem > 3);
-    mostrarTorres();
+    }while(saida < 1 || saida > 3);
     printf("Informe qual a torre de destino (1 a 3): \t");
-    scanf("%d", &destino);
+    scanf("%d", &chegada);
     do{
-      if(destino < 1 || destino > 3){
-        printf(" - Torre de destino não corresponde, informe corretamente.\nInforme qual a torre de destino (1 a 3): ");
-        scanf("%d", &destino); 
+      if(chegada < 1 || chegada > 3){
+        printf(" - Torre de destino nao corresponde, informe corretamente.\nInforme qual a torre de destino (1 a 3): ");
+        scanf("%d", &chegada); 
       }
-      if(destino == origem){
-        printf(" - O destino não pode ser igual a torre de origem.\nInforme qual a torre de destino (1 a 3): ");
-        scanf("%d", &destino); 
+      if(chegada == saida){
+        printf(" - O destino nao pode ser igual a torre de origem.\nInforme qual a torre de destino (1 a 3): ");
+        scanf("%d", &chegada); 
       }
-      }while(destino < 1 || destino > 3 || destino == origem);
-    moverDiscos(origem, destino);
+      }while(chegada < 1 || chegada > 3 || chegada == saida);
+
+      if(saida == 1){
+        if(chegada == 2){
+          esquerda->moveDisco(meio);
+        }else if(chegada == 3){
+          esquerda->moveDisco(direita);
+        }
+      }else if(saida == 2){
+        if(chegada == 1){
+          meio->moveDisco(esquerda);
+        }else if(chegada == 3){
+          meio->moveDisco(direita);
+        }
+      }else if(saida == 3){
+        if(chegada==1){
+          direita->moveDisco(esquerda);
+        }else if(chegada == 2){
+          direita->moveDisco(meio);
+        }
+      }
+
+       constroitorre();  
   }while(test != 1);
 }
 
 
-void mostrarTorres(){
-
-  system("CLS");
-  printf("\t   ---TORRE DE HANOI--- \n");
-
-  /*//colocar um if aqui, pra passar no for abaixo qual os arrays certos
-  //retirar/mover esse if
-  if(numeroDeDiscos == 3){
-    int torre1[3]= {1,2,3}, torre2[3]={0,0,0}, torre3[3] ={0,0,0};
-  }else if(numeroDeDiscos == 4){
-    //int torre1[4]= {1,2,3,4}, torre2[3]={0,0,0,0}, torre3[3] ={0,0,0,0};
-  }else if(numeroDeDiscos == 5){
-    //int torre1[5]= {1,2,3,4,5}, torre2[5]={0,0,0,0,0}, torre3[5] ={0,0,0,0,0};
-  }*/
-
-  for(int i=0;i<numeroDeDiscos;i++){ //impressao da torre
-
-    printf(" \t |%d|    |%d|    |%d| \n", torre1[i], torre2[i], torre3[i]); 
-  
-  }
-  printf("\t Nº de jogadas: ");
-  if(numeroDeJogadas < 10){
-    printf("0%d\n", numeroDeJogadas);
-  }else{
-    printf("%d\n", numeroDeJogadas);
-  }
+void resolucaoIA(Haste *origem, Haste *intermediario, Haste *destino, int numeroDeDiscos) {
+    if(numeroDeDiscos == 1){
+        origem->moveDisco(destino);
+        constroitorre();
+    }
+    
+    else{
+        resolucaoIA(origem, destino, intermediario, numeroDeDiscos -1);
+        origem->moveDisco(destino);
+        constroitorre();
+        resolucaoIA(intermediario, origem, destino, numeroDeDiscos-1);
+    }
 }
 
 
-int verificarFinal(){
-  int opt=0;
-  if(torre3[0] == 1){
-    opt = 1;
-  }
-  return(opt);
-}
+string insereQTD(int qtd, string simbolo) {
 
+    string resp = "";
+
+    for (int i= 0; i < qtd; i++) {
+
+        resp += simbolo;
+
+    }
+
+    return resp;
+}
 
 void regrasDoJogo(){
   system("CLS");
-  printf(" - Torre de Hanói:\n");
-  printf("   O objetivo deste jogo, consiste em deslocar todos os discos da primeira haste para a última haste.\n");
+  printf(" - Torre de Hanoi:\n");
+  printf("   O objetivo deste jogo, consiste em deslocar todos os discos da primeira haste para a ultima haste.\n");
   printf("   Respeitando as seguintes regras:\n\n");
-  printf("    1 - Deslocar um disco de cada vez, o qual deverá ser o do topo de uma das três hastes.\n\n");
-  printf("    2 - Cada disco nunca poderá ser colocado sobre outro de tamanho menor.\n\n ");
+  printf("    1 - Deslocar um disco de cada vez, o qual devera ser o do topo de uma das tres hastes.\n\n");
+  printf("    2 - Cada disco nunca podera ser colocado sobre outro de tamanho menor.\n\n ");
   system("pause");
   system("CLS");
 }
