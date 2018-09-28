@@ -296,8 +296,8 @@ void mostrarMenu(Haste *esquerda, Haste *meio, Haste *direita){
       }
       system("PAUSE");
       system("CLS");
-      printf("\n\n\t\t\t  Jogo encerrado com sucesso.\n");
-      exit(0); 
+      printf("\n\n Jogo encerrado com sucesso.\n");
+       break;
     }
     printf("Informe qual a torre de origem (1 a 3): ");
     scanf("%d", &saida);
@@ -307,7 +307,7 @@ void mostrarMenu(Haste *esquerda, Haste *meio, Haste *direita){
         scanf("%d", &saida); 
       }
     }while(saida < 1 || saida > 3);
-    printf("Informe qual a torre de destino (1 a 3): \t");
+    printf("Informe qual a torre de destino (1 a 3): ");
     scanf("%d", &chegada);
     do{
       if(chegada < 1 || chegada > 3){
