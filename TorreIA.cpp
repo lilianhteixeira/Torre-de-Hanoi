@@ -18,9 +18,9 @@ struct Haste{
     int numerodiscos;
 	
 	void novaHaste(int size) {
-	    pilha = new int[size];
+	    pilha = new int[size + 1];
 	    topo = -1;
-        numerodiscos = size;//AQUI!!
+        numerodiscos = size + 1;
         zerarArray();
 
 	}
@@ -44,7 +44,7 @@ struct Haste{
 	}
 	
 	int len() {
-		return numerodiscos;//AQUI!!
+		return numerodiscos;
 	}
 	
 	bool isFull() {
@@ -123,7 +123,7 @@ int main(){
         cout << "---Torre De Hanoi---\n" <<
             "Escolhar uma opção:\n" <<
             "1 - Jogar Torre De Hanoi\n" <<
-            "2 - IA Resolve\n";
+            "2 - IA Resolve\n\n";
 
     cin >> escolha;
     }
@@ -159,8 +159,9 @@ int main(){
     else if(escolha == 2){
        
        while(numeroDeDiscos < 3){
-           cout << "Digite o Numero De Discos(Maior ou igual a 3):" << "\n";
+           cout << "\nDigite o Numero De Discos(Maior ou igual a 3):" << "\n";
            cin >> numeroDeDiscos;
+           cout << "\n";
        }
         inicializarJogo();
         resolucaoIA(&esquerda, &meio, &direita, numeroDeDiscos);
