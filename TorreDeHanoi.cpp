@@ -1,55 +1,66 @@
-
-/* Praticas De Paradgimas De Linguagens De Programação
-            Projeto Torre De Hanoi
-                Grupo 3
-        Bruno Meneses
-        Alex Micaela
-        Lílian Honorio Teixeira
-        Victor Arruda Câmara Virgolino
-*/
-
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h> 
-using namespace std;
-
-void mostrarTorres(); 
-int valorTorre(int torre[numeroDeDiscos]); 
-int destinoTorre(int torre[numeroDeDiscos]); 
-void moverDiscos(int orig, int dest); 
-void mostrarMenu(); 
-int verificarFinal(); 
-void regras(); 
-
+#include <math.h> // usa a função pow();, para calcular o valor minimo de movimentos para resolver a torre de hanoi;
+#include <locale.h>
 
 int nivelDeDificuldade;
 int numeroDeDiscos;
-int torre1[5]= {1,2,3,4,5}, torre2[numeroDeDiscos]={}, torre3[numeroDeDiscos] ={}; // ARRAYS;
 
-int cont=0;
+int torre1[3]= {1,2,3}, torre2[3]={0,0,0}, torre3[3] ={0,0,0};
+//int torre14[4]= {1,2,3,4}, torre24[3]={0,0,0,0}, torre34[3] ={0,0,0,0};
+//int torre15[5]= {1,2,3,4,5}, torre25[5]={0,0,0,0,0}, torre35[5] ={0,0,0,0,0};// criar um para cada opção
 
+int numeroDeJogadas = 0; 
+
+void mostrarTorres(); 
+
+int valorTorre(int torre[3]); 
+
+int destinoTorre(int torre[3]);
+
+void moverDiscos(int orig, int dest); 
+
+void mostrarMenu(); 
+
+int verificarFinal(); 
+
+void regrasDoJogo();
 
 int main(void){
-  int op=1;
-  while(op!=0){
-    printf(" - TORRE DE HANOI \n   2 - JOGAR\n   1 - REGRAS\n   0 - SAIR\n - DIGITE: ");
-    scanf("%d", &op);
-    switch(op){
-      case 2:
+
+  setlocale(LC_ALL, "Portuguese");//nao esta habilitando a acentuacao
+
+  int opcao = 1;
+  while(opcao!=0){
+    printf("---Torre De Hanoi---\n Escolhar uma opção:\n 1 - Jogar Torre De Hanoi\n 2 - IA Resolve\n 3 - Regras do jogo\n 4 - Sair\n  - DIGITE: ");
+    scanf("%d", &opcao);
+    switch(opcao){
+      case 1:
+          printf("\nEscolha qual será a dificuldade: \n 1 - Fácil(3 discos)\n 2 - Médio(4 discos)\n 3 - Dificil(5 discos)\n");
+          scanf("%d", &nivelDeDificuldade);
+
+          if(nivelDeDificuldade == 1){
+            numeroDeDiscos = 3;
+          } else if(nivelDeDificuldade == 2){
+            numeroDeDiscos = 4;
+          } else if(nivelDeDificuldade == 3){
+            numeroDeDiscos = 5;
+          }
+
           mostrarTorres();
           mostrarMenu();
           break;
-      case 1:
-          regras();
+      case 3:
+          regrasDoJogo();
           break;
       default:
-          if(op != 0){
-            printf(" - OPÇÃO INVALIDA INFORME NOVAMENTE\n - ");
+          if(opcao != 0){
+            printf(" - Opção inválida, por favor informe uma opcao válida.\n - ");
             system("PAUSE");
             system("CLS");
           }else{
             system("CLS");
-            printf("\n\n\t\t\t  ENCERRADO COM SUCESSO.\n");
+            printf("\n\n\t\t\t  Jogo encerrado com sucesso.\n");
           }   
           break;
     }
@@ -57,40 +68,23 @@ int main(void){
   return 0;
 }
 
-void mostrarTorres(){
-  printf("\nEscolha a Dificuldade: \n 1 - Fácil(3 discos)\n 2 - Médio(4 discos)\n 3 - Dificil(5 discos)\n");
-  scanf("%d", &nivelDeDificuldade);
-
-  if(nivelDeDificuldade == 1){
-    numeroDeDiscos = 3;
-  } else if(nivelDeDificuldade == 2){
-    numeroDeDiscos = 4;
-  } else if(nivelDeDificuldade == 3){
-    numeroDeDiscos = 5;
-  }
-
-  system("CLS");
-  printf("\t   TORRE DE HANOI \n");
-  for(int i=0;i<numeroDeDiscos;i++){
-    printf(" \t |%d|    |%d|    |%d| \n", torre1[i], torre2[i], torre3[i]); 
-    
-  }
-  printf("\t Nº de jogadas: ");
-  if(cont < 10){
-    printf("0%d\n", cont);
-  }else{
-    printf("%d\n", cont);
-  }
-}
-
 
 int valorTorre(int torre[]){ 
-  int i, a=0;
+  int i, a=0, auxiliar= 2;
+
+  if(numeroDeDiscos == 4){
+    torre[4];
+    auxiliar = 3;
+  }else if(numeroDeDiscos == 5){
+    torre[5];
+    auxiliar = 4;
+  }
+
   for(i=numeroDeDiscos-1; i>=0; i--){
     if(torre[i] != 0){
       a = i;
     }
-    if(torre[4] == 0){
+    if(torre[auxiliar] == 0){
       a = 0;
     }
   }
@@ -100,6 +94,13 @@ int valorTorre(int torre[]){
 
 int destinoTorre(int torre[]){ 
   int i, a=0;
+
+  if(numeroDeDiscos == 4){
+    torre[4];
+  }else if(numeroDeDiscos == 5){
+    torre[5];
+  }
+
   for(i=0; i<numeroDeDiscos; i++){
     if(torre[i] == 0){
       a = i;
@@ -109,13 +110,20 @@ int destinoTorre(int torre[]){
 }
 
 
-void moverDiscos(int orig, int dest){
+void moverDiscos(int origem, int destino){ 
   int aux1, aux2, aux3;
   
+  if(numeroDeDiscos == 4){
+    int torre1[4]= {1,2,3,4}, torre2[4]={0,0,0,0}, torre3[4] ={0,0,0,0};
+  }else if(numeroDeDiscos == 5){
+    int torre1[5]= {1,2,3,4,5}, torre2[5]={0,0,0,0,0}, torre3[5] ={0,0,0,0,0};
+  }  
+
+
   // ORIGEM 1 - TORRE 1
-  if(orig == 1){
+  if(origem == 1){
     // DESTINO 2 - TORRE 2  
-    if(dest == 2){
+    if(destino == 2){
       aux1 = torre1[valorTorre(torre1)];
       aux2 = torre2[destinoTorre(torre2)+1] ;
       aux3 = torre2[valorTorre(torre2)];
@@ -129,7 +137,7 @@ void moverDiscos(int orig, int dest){
         }else{
           torre1[valorTorre(torre1)] = 0;
           torre2[destinoTorre(torre2)] = aux1;
-          cont++;
+          numeroDeJogadas++;
         }
       }
     // DESTINO 3 - TORRE 3
@@ -147,16 +155,16 @@ void moverDiscos(int orig, int dest){
         }else{
           torre1[valorTorre(torre1)] = 0;
           torre3[destinoTorre(torre3)] = aux1;
-          cont++;
+          numeroDeJogadas++;
         }
       }
     }     
   }
   
   // ORIGEM 2 - TORRE 2
-  if(orig == 2){
+  if(origem == 2){
     // DESTINO 1 - TORRE 1
-    if(dest == 1){
+    if(destino == 1){
       aux1 = torre2[valorTorre(torre2)];
       aux2 = torre1[destinoTorre(torre1)+1] ;
       aux3 = torre1[valorTorre(torre1)];
@@ -170,7 +178,7 @@ void moverDiscos(int orig, int dest){
         }else{
           torre2[valorTorre(torre2)] = 0;
           torre1[destinoTorre(torre1)] = aux1;
-          cont++;
+          numeroDeJogadas++;
         }
       }
     // DESTINO 3 - TORRE 3
@@ -188,16 +196,16 @@ void moverDiscos(int orig, int dest){
         }else{
           torre2[valorTorre(torre2)] = 0;
           torre3[destinoTorre(torre3)] = aux1;
-          cont++;         
+          numeroDeJogadas++;         
         }
       }
     } 
   }
   
   // ORIGEM 3 - TORRE 3
-  if(orig == 3){
+  if(origem == 3){
     // DESTINO 1 - TORRE 1
-    if(dest == 1){
+    if(destino == 1){
       aux1 = torre3[valorTorre(torre3)];
       aux2 = torre1[destinoTorre(torre1)+1] ;
       aux3 = torre1[valorTorre(torre1)];
@@ -211,7 +219,7 @@ void moverDiscos(int orig, int dest){
         }else{
           torre3[valorTorre(torre3)] = 0;
           torre1[destinoTorre(torre1)] = aux1;
-          cont++;       
+          numeroDeJogadas++;       
         }   
       }
     // DESTINO 2 - TORRE 2
@@ -229,7 +237,7 @@ void moverDiscos(int orig, int dest){
         }else{
           torre3[valorTorre(torre3)] = 0;
           torre2[destinoTorre(torre2)] = aux1;
-          cont++;
+          numeroDeJogadas++;
         }
       }
     } 
@@ -239,46 +247,75 @@ void moverDiscos(int orig, int dest){
 
 
 void mostrarMenu(){
-  int orig, dest, test=0, aux;
+  int origem, destino, test=0, aux;
   do{
-    
+    // VERIFICA SE GANHOU!
     if(verificarFinal() == 1){
       aux = pow(2, numeroDeDiscos)-1;
-      if(cont == aux){
-        printf("\nParabéns, você ganhou e sua pontuação foi excelente %d de %d.\n", cont, aux);
-      }else if(cont > aux && cont <aux+5){
-        printf("\nParabéns, você ganhou mas sua pontuação foi abaixo da média %d de%d.\n", cont, aux);
+      if(numeroDeJogadas == aux){
+        printf("\nParabéns, você ganhou e sua pontuação foi excelente %d de %d.\n", numeroDeJogadas, aux);
+      }else if(numeroDeJogadas > aux && numeroDeJogadas <aux+5){
+        printf("\nParabéns, você ganhou mas sua pontuação foi abaixo da média %d de%d.\n", numeroDeJogadas, aux);
       }else{
-        printf("\nParabéns, você ganhou mas sua pontuação foi ruim: %d de %d.\n", cont, aux);
+        printf("\nParabéns, você ganhou mas sua pontuação foi ruim: %d de %d.\n", numeroDeJogadas, aux);
       }
       system("PAUSE");
       system("CLS");
-      printf("\n\n\t\t\t  ENCERRADO COM SUCESSO.\n");
-      exit(0); // FINALIZA O PROGRAMA;
+      printf("\n\n\t\t\t  Jogo encerrado com sucesso.\n");
+      exit(0); 
     }
-    printf("Informe Torre Origem (1 a 3): ");
-    scanf("%d", &orig);
+    printf("Informe qual a torre de origem (1 a 3): ");
+    scanf("%d", &origem);
     do{
-      if(orig < 1 || orig > 3){
-        printf(" - Torre de Origem não corresponde, informe corretamente.\nInforme Torre Origem (1 a 3): ");
-        scanf("%d", &orig); 
+      if(origem < 1 || origem > 3){
+        printf(" - Torre de origem não corresponde, informe corretamente.\nInforme qual a torre de origem (1 a 3): ");
+        scanf("%d", &origem); 
       }
-    }while(orig < 1 || orig > 3);
+    }while(origem < 1 || origem > 3);
     mostrarTorres();
-    printf("Informe Torre Destino (1 a 3): \t");
-    scanf("%d", &dest);
+    printf("Informe qual a torre de destino (1 a 3): \t");
+    scanf("%d", &destino);
     do{
-      if(dest < 1 || dest > 3){
-        printf(" - Torre de Destino não corresponde, informe corretamente.\nInforme Torre Destino (1 a 3): ");
-        scanf("%d", &dest); 
+      if(destino < 1 || destino > 3){
+        printf(" - Torre de destino não corresponde, informe corretamente.\nInforme qual a torre de destino (1 a 3): ");
+        scanf("%d", &destino); 
       }
-      if(dest == orig){
-        printf(" - O destino não pode ser igual a torre de origem.\nInforme Torre Destino (1 a 3): ");
-        scanf("%d", &dest); 
+      if(destino == origem){
+        printf(" - O destino não pode ser igual a torre de origem.\nInforme qual a torre de destino (1 a 3): ");
+        scanf("%d", &destino); 
       }
-      }while(dest < 1 || dest > 3 || dest == orig);
-    moverDiscos(orig, dest);
+      }while(destino < 1 || destino > 3 || destino == origem);
+    moverDiscos(origem, destino);
   }while(test != 1);
+}
+
+
+void mostrarTorres(){
+
+  system("CLS");
+  printf("\t   ---TORRE DE HANOI--- \n");
+
+  /*//colocar um if aqui, pra passar no for abaixo qual os arrays certos
+  //retirar/mover esse if
+  if(numeroDeDiscos == 3){
+    int torre1[3]= {1,2,3}, torre2[3]={0,0,0}, torre3[3] ={0,0,0};
+  }else if(numeroDeDiscos == 4){
+    //int torre1[4]= {1,2,3,4}, torre2[3]={0,0,0,0}, torre3[3] ={0,0,0,0};
+  }else if(numeroDeDiscos == 5){
+    //int torre1[5]= {1,2,3,4,5}, torre2[5]={0,0,0,0,0}, torre3[5] ={0,0,0,0,0};
+  }*/
+
+  for(int i=0;i<numeroDeDiscos;i++){ //impressao da torre
+
+    printf(" \t |%d|    |%d|    |%d| \n", torre1[i], torre2[i], torre3[i]); 
+  
+  }
+  printf("\t Nº de jogadas: ");
+  if(numeroDeJogadas < 10){
+    printf("0%d\n", numeroDeJogadas);
+  }else{
+    printf("%d\n", numeroDeJogadas);
+  }
 }
 
 
@@ -291,7 +328,7 @@ int verificarFinal(){
 }
 
 
-void regras(){
+void regrasDoJogo(){
   system("CLS");
   printf(" - Torre de Hanói:\n");
   printf("   O objetivo deste jogo, consiste em deslocar todos os discos da primeira haste para a última haste.\n");
