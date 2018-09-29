@@ -6,7 +6,6 @@
         Bruno Meneses
         Lílian Honorio Teixeira
         Victor Arruda Câmara Virgolino
-		
 */
 
 #include <iostream>
@@ -39,9 +38,9 @@ struct Haste
 
 	void novaHaste(int size)
 	{
-		pilha = new int[size + 1]; //AQUI!!
+		pilha = new int[size + 1];
 		topo = -1;
-		numerodiscos = size;//AQUI!!
+		numerodiscos = size;
 		zerarArray();
 
 	}
@@ -66,7 +65,7 @@ struct Haste
 
 	int len()
 	{
-		return numerodiscos;//AQUI!!
+		return numerodiscos;
 	}
 
 
@@ -193,8 +192,6 @@ void resetaVariaveis()
 
 int main()
 {
-
-	setlocale(LC_ALL, "Portuguese");//nao esta habilitando a acentuacao
 	do
 	{
 		resetaVariaveis();
